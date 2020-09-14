@@ -1,14 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const socketio = require("socket.io");
 require("dotenv").config();
 const { handleError } = require("./helpers/errorHandler");
 
 const userRouter = require("./routes/user");
 
 const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
 
-// connect to DB
+// // connect to DB
 mongoose.connect(
   process.env.MONGO_URI,
   {
@@ -23,14 +27,24 @@ mongoose.connect(
 );
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 
-// routes
-app.use("/api/users", userRouter);
+app.use(cors())
 
-// listener
 const port = process.env.PORT || 8000;
-const listener = app.listen(port, () => {
-  console.log(`Listening on port ${listener.address().port}`);
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.emit("FromAPI", new Date());
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
 });
+
+// // routes
+app.use("/api/user", userRouter);
+
+// // listener
+server.listen(port, () => console.log(`Listening on port ${port}`));
