@@ -32,11 +32,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors())
 
 const port = process.env.PORT || 8000;
-
+/* 
+socket.emit ME ONLY
+socket.braodcast.emit EVERYONE BUT ME
+io.emit ALL
+*/
 io.on("connection", (socket) => {
   console.log("New client connected");
 
   socket.emit("FromAPI", new Date());
+
+  socket.on("newMessage", message => {
+    console.log(message)
+    io.emit("messages", message)
+  })
 
   socket.on("disconnect", () => {
     console.log("Client disconnected");
