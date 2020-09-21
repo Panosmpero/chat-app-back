@@ -11,11 +11,11 @@ const confirmPassword = async (password, hash) => {
   return await bcrypt.compare(password, hash);
 };
 
-const formatWelcome = (username) => {
-  return { username, text: "Welcome to Bercord!", date: Date.now() };
+const formatWelcome = (username, channel) => {
+  return { username, text: `Welcome to ${channel}!`, date: Date.now() };
 };
 
-const formatJoin = (username) => {
+const formatJoin = (username, bot) => {
   const joinMessages = [
     `${username} just joined the server - glhf!`,
     `${username} just joined. Everyone, look busy!`,
@@ -40,7 +40,7 @@ const formatJoin = (username) => {
     `${username} just showed up. Hold my beer.`,
   ];
   let randomNumber = Math.floor(Math.random() * joinMessages.length);
-  return { username, text: joinMessages[randomNumber], date: Date.now() };
+  return { username: bot, text: joinMessages[randomNumber], date: Date.now() };
 };
 
 const formatMessage = (username, text) => {
@@ -51,10 +51,28 @@ const formatMessage = (username, text) => {
   };
 };
 
+const countChannelUsers = (connectedUsers) => {
+  let total = {};
+  for (let channel in connectedUsers) {
+    total[channel] = connectedUsers[channel].length;
+  }
+  console.log(total);
+  return total;
+};
+
+const emitChannelData = (io, channel, connectedUsers, socketChannel) => {
+  io.emit("channel data", {
+    users: connectedUsers[channel],
+    channelsUsers: countChannelUsers(connectedUsers),
+    totalUsers: Object.keys(socketChannel).length,
+  });
+}
+
 module.exports = {
   encryptPassword,
   confirmPassword,
   formatWelcome,
   formatJoin,
   formatMessage,
+  emitChannelData
 };
