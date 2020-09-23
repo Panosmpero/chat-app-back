@@ -7,6 +7,7 @@ require("dotenv").config();
 const socket = require("./socket");
 
 const userRouter = require("./routes/user");
+const messageRoute = require("./routes/channel");
 
 const app = express();
 const server = http.createServer(app);
@@ -15,9 +16,10 @@ const server = http.createServer(app);
 mongoose.connect(
   process.env.MONGO_URI,
   {
-    useFindAndModify: true,
+    useFindAndModify: false,
     useUnifiedTopology: true,
     useNewUrlParser: true,
+    useCreateIndex: true
   },
   (err, client) => {
     if (err) return console.log("DB error");
@@ -37,6 +39,7 @@ const port = process.env.PORT || 8000;
 
 // routes
 app.use("/api/user", userRouter);
+app.use("/api/chat", messageRoute);
 
 // listener
 server.listen(port, () => console.log(`Listening on port ${port}`));

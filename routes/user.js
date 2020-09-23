@@ -7,7 +7,7 @@ const { handleError } = require("../helpers/errorHandler");
 router.get("/", async (req, res) => {
   try {
     const users = await User.find({});
-    if (!users) handleError(res, 404, "Users not found");
+    if (!users) return handleError(res, 404, "Users not found");
     res.status(200).send(users);
 
   } catch (error) {
