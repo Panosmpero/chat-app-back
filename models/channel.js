@@ -8,7 +8,7 @@ const channelSchema = new Schema({
   },
   messages: [
     {
-      user: {
+      username: {
         type: String,
       },
       text: {

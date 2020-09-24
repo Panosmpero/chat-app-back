@@ -3,7 +3,7 @@ const Channel = require("../models/channel");
 const { handleError } = require("../helpers/errorHandler");
 
 // get all channels
-router.get("/", async (req, res) => {
+router.get("/get", async (req, res) => {
   console.log("get all channels")
   try {
     const channels = await Channel.find({});
@@ -11,9 +11,22 @@ router.get("/", async (req, res) => {
 
     res.status(200).send(channels);
   } catch (error) {
-    handleError(res, 400, error);
+    handleError(res, 400, error.message);
   }
 });
+
+// get a channel's messages
+router.get("/get/:channel", async (req, res) => {
+  console.log("get a channel's messages")
+  try {
+    const { channel } = req.params;
+    const ch = await Channel.findOne({ title: channel }).select("messages -_id")
+    if (!ch) return handleError(res, 404, "Channel not found in DB");
+    res.status(200).send(ch.messages.reverse());
+  } catch (error) {
+    handleError(res, 400, error.message);    
+  }
+})
 
 // create new channel
 router.post("/newchannel", async (req, res) => {
@@ -41,15 +54,15 @@ router.put("/add/:channel", async (req, res) => {
 
     const ch = await Channel.findOneAndUpdate(
       { title: channel },
-      { $push: { messages: { user: username, text: message } } },
+      { $push: { messages: { username, text: message } } },
       { new: true }
     );
 
     if (!ch) return handleError(res, 401, "Failed to add message");
-    console.log(ch);
-    res.status(200).send("OK");
+    res.status(200).send(ch);
+
   } catch (error) {
-    handleError(res, 400, error);
+    handleError(res, 400, error.message);
   }
 });
 
@@ -70,7 +83,7 @@ router.put("/reaction", async (req, res) => {
 
   } catch (error) {
     console.log("==========================", error)
-    handleError(res, 400, error);
+    handleError(res, 400, error.message);
   }
 });
 
@@ -107,7 +120,7 @@ router.put("/remove", async (req, res) => {
 
   } catch (error) {
     console.log("==========================", error)
-    handleError(res, 400, error);
+    handleError(res, 400, error.message);
   }
 });
 
