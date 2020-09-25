@@ -11,8 +11,8 @@ const confirmPassword = async (password, hash) => {
   return await bcrypt.compare(password, hash);
 };
 
-const formatWelcome = (username, channel) => {
-  return { username, text: `Welcome to ${channel}!`, date: Date.now() };
+const formatWelcome = (username, channel, savedMessages) => {
+  return { username, text: `Welcome to ${channel}!`, savedMessages, date: Date.now() };
 };
 
 const formatJoin = (username, bot) => {

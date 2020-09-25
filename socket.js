@@ -58,7 +58,7 @@ module.exports = (server) => {
       socket.join(user.channel);
 
       // well met user!
-      socket.emit("message", formatWelcome(bot, user.channel));
+      socket.emit("message", formatWelcome(bot, user.channel, data.savedMessages));
 
       // let everyone know about the user that connected
       socket.broadcast
