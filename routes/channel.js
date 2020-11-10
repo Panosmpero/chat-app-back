@@ -67,17 +67,17 @@ router.put("/add/:channel", async (req, res) => {
 });
 
 // add like to a message
-router.put("/reaction", async (req, res) => {
+router.put("/reaction/like", async (req, res) => {
   console.log("like")
   try {
-    const { usernameId, messageId } = req.body;
+    const { userId, messageId } = req.body;
 
     const likedMessage = await Channel.findOneAndUpdate(
       { "messages._id": messageId },
-      { $addToSet: { "messages.$.likes": usernameId } },
+      { $addToSet: { "messages.$.likes": userId } },
       { new: true }
     );
-    if (!likedMessage) return handleError(res, 404, "Not found");
+    if (!likedMessage) return handleError(res, 404, "Error adding like to message");
     console.log(likedMessage);
     res.status(200).send("OK");
 
@@ -86,6 +86,27 @@ router.put("/reaction", async (req, res) => {
     handleError(res, 400, error.message);
   }
 });
+
+// remove like to a message
+router.put("/reaction/like/remove", async (req, res) => {
+  console.log("remove like")
+  try {
+    const { userId, messageId } = req.body;
+    console.log(userId, messageId)
+    const removeLikeMessage = await Channel.findOneAndUpdate(
+      { "messages._id": messageId },
+      { $pull:  { "messages.$.likes": userId } },
+      { new: true }
+    );
+    if (!removeLikeMessage) return handleError(res, 404, "Error removeing like from message");
+    console.log(removeLikeMessage);
+    res.status(200).send("OK");
+    
+  } catch (error) {
+    console.log("==========================", error)
+    handleError(res, 400, error.message);
+  }
+})
 
 // REMOVE A MESSAGE -- replace message with --[Message Removed]--
 router.put("/remove", async (req, res) => {

@@ -40,16 +40,17 @@ router.post("/signin", async (req, res) => {
   try {
     let { username, password } = req.body;
     let signInUser = await User.findOne({ username });
-    if (!signInUser) return handleError(res, 404, "User not found!");
+    if (!signInUser) return handleError(res, 404, "Wrong Username or Password!");
 
     // check for password
     const confirmPassword = await util.confirmPassword(
       password,
       signInUser.password
     );
-    if (!confirmPassword) return handleError(res, 401, "Wrong Password!");
+    if (!confirmPassword) return handleError(res, 401, "Wrong Username or Password!");
     res.status(200).send({
       username: signInUser.username,
+      userId: signInUser._id,
       isAdmin: signInUser.isAdmin,
     });
 
