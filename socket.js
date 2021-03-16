@@ -83,6 +83,29 @@ module.exports = (server) => {
     });
 
     // ===============================================================
+    // Get like/removeLike from user and emit back to all users in channel
+    // ===============================================================
+    socket.on("sent like", ({ userId, messageId, channel }) => {
+      const user = connectedUsers[channel].find(
+        (user) => user.id === socket.id
+      );
+      io.to(user.channel).emit(
+        "like",
+        { userId, messageId }
+      );
+    });
+
+    socket.on("sent removeLike", ({ userId, messageId, channel }) => {
+      const user = connectedUsers[channel].find(
+        (user) => user.id === socket.id
+      );
+      io.to(user.channel).emit(
+        "removeLike",
+        { userId, messageId }
+      );
+    });
+
+    // ===============================================================
     // On leave channel
     // ===============================================================
     socket.on("leave channel", () => {
